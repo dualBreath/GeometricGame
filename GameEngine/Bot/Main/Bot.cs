@@ -34,7 +34,7 @@ namespace AI
             
             greed.SetBlocks(blocked);
             greed.SetDestinations(destinations);
-
+            
             if (greed.IsInDestinations(bot.Centre))
             {
                 step = Aim(bot, player);
@@ -113,7 +113,7 @@ namespace AI
             }
             else
             {
-                if(IsRightDirection(bot, step))
+                if (IsRightDirection(bot, step))
                 {
                     return GameKeys.Move;
                 }

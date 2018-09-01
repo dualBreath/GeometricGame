@@ -19,6 +19,7 @@ namespace GUI
             LoadGame();
 
             game = new Thread(new ThreadStart(Start));
+            game.IsBackground = true;
             game.Start();
         }
 

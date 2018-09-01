@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading;
+﻿using System.Diagnostics;
 using GameEngine.Entities;
 using GameEngine.Main;
 using GameEngine.Storages;
@@ -15,12 +13,9 @@ namespace GameEngine
         private bool pause;
         private bool stop;
         private bool keyLock;
-        private bool botKeyLock;
         private Level currentLevel;
 
         private GameKeys playerStep = GameKeys.None;
-        private GameKeys botStep = GameKeys.None;
-
 
         public GameController()
         {
@@ -28,7 +23,6 @@ namespace GameEngine
             stop = false;
             keyLock = false;
             playerStep = GameKeys.None;
-            botStep = GameKeys.None;
             currentLevel = null;
             State = new GameState();
         }
@@ -43,18 +37,7 @@ namespace GameEngine
             }
             return false;
         }
-
-        public bool BotStep(GameKeys key)
-        {
-            if (!botKeyLock)
-            {
-                botStep = key;
-                botKeyLock = true;
-                return true;
-            }
-            return false;
-        }
-
+        
         private void ResetStep()
         {
             keyLock = false;
@@ -71,8 +54,9 @@ namespace GameEngine
             while (!stop)
             {
                 while(!pause)
-                {                    
-                    var botStep = AI.Bot.Decide(currentLevel);
+                {
+                    //Thread.Sleep(1);
+                    var botStep = GameKeys.None; //*/AI.Bot.Decide(currentLevel);
                     if(stopWatch.ElapsedMilliseconds > 50)
                     {
                         MovingController.MoveBullets(currentLevel);
@@ -102,9 +86,10 @@ namespace GameEngine
             if (currentLevel != null && State != null)
             {
                 var m = currentLevel.ConvertToString();
+                
                 //lock (State.Map)
                 //{
-                    State.Map = m;
+                      State.Map = m;
                 //}
             }
         }
