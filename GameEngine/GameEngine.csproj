@@ -46,19 +46,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bot\Algorithm\Algorithms.cs" />
-    <Compile Include="Bot\Algorithm\LeeSearch.cs" />
-    <Compile Include="Bot\Util\Area.cs" />
-    <Compile Include="Bot\Util\Quater.cs" />
-    <Compile Include="Bot\Util\Shadow.cs" />
-    <Compile Include="Bot\Main\Bot.cs" />
-    <Compile Include="Bot\Util\Greed.cs" />
     <Compile Include="Entities\Block.cs" />
     <Compile Include="Entities\Bullet.cs" />
     <Compile Include="Entities\Field.cs" />
     <Compile Include="Interfaces\IGame.cs" />
     <Compile Include="Interfaces\IRound.cs" />
     <Compile Include="Interfaces\ISquare.cs" />
+    <Compile Include="Storages\GameInfo.cs" />
     <Compile Include="Utility\ObjectType.cs" />
     <Compile Include="Entities\Player.cs" />
     <Compile Include="Main\MovingController.cs" />
@@ -68,7 +62,7 @@
     <Compile Include="Utility\Position.cs" />
     <Compile Include="Main\Game.cs" />
     <Compile Include="Main\GameController.cs" />
-    <Compile Include="Utility\GameKeys.cs" />
+    <Compile Include="Utility\GameActions.cs" />
     <Compile Include="Storages\GameState.cs" />
     <Compile Include="Storages\Level.cs" />
     <Compile Include="Interfaces\IGameObject.cs" />

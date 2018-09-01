@@ -45,6 +45,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bot\Algorithm\Algorithms.cs" />
+    <Compile Include="Bot\Algorithm\LeeSearch.cs" />
+    <Compile Include="Bot\Main\Bot.cs" />
+    <Compile Include="Bot\Util\Area.cs" />
+    <Compile Include="Bot\Util\Greed.cs" />
+    <Compile Include="Bot\Util\Quater.cs" />
+    <Compile Include="Bot\Util\Shadow.cs" />
     <Compile Include="Drawer.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

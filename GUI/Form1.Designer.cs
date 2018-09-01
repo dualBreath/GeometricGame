@@ -39,7 +39,7 @@
             this.mainField.Size = new System.Drawing.Size(689, 353);
             this.mainField.TabIndex = 0;
             this.mainField.TabStop = false;
-            this.mainField.Paint += new System.Windows.Forms.PaintEventHandler(this.mainField_Paint);
+            this.mainField.LoadCompleted += new System.ComponentModel.AsyncCompletedEventHandler(this.mainField_LoadCompleted);
             // 
             // Form1
             // 

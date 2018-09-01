@@ -3,7 +3,7 @@ using GameEngine.Utility;
 
 namespace GameEngine.Entities
 {
-    class Bullet : IGameObject, IRound
+    public class Bullet : IGameObject, IRound
     {
         public ObjectType Type => ObjectType.Bullet;
         public Position Centre { get; set; }        

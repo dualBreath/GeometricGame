@@ -13,8 +13,9 @@ namespace GameEngine.Main
         private static int bulletSpeed = 2;
         private static int bulletRadius = 2;
 
-        internal static void MoveBullets(Level level)
+        internal static void MoveBullets(Level level, out Bullet killerBullet)
         {
+            killerBullet = null;
             var field = (Field)level.Field.Find(elem => elem.Type == ObjectType.Field);
 
             foreach (Bullet bullet in level.Field.FindAll(obj => obj.Type == ObjectType.Bullet))
@@ -25,7 +26,11 @@ namespace GameEngine.Main
 
                 if (Mathematics.IsInField(field.Width, field.Height, bullet.Radius, newCentre))
                 {
-                    MoveBullet(level.Field, bullet, newCentre);
+                    MoveBullet(level.Field, bullet, newCentre, out var kBbullet);
+                    if(kBbullet != null)
+                    {
+                        killerBullet = kBbullet;
+                    }
                 }
                 else
                 {
@@ -34,10 +39,10 @@ namespace GameEngine.Main
             }
         }
         
-        private static void MoveBullet(List<IGameObject> field, Bullet bullet, Position newCentre)
+        private static void MoveBullet(List<IGameObject> field, Bullet bullet, Position newCentre, out Bullet killer)
         {
-            var isCollision = false;
-            var collidingObject = CheckCollision(field, bullet, newCentre, out isCollision);
+            killer = null;
+            var collidingObject = CheckCollision(field, bullet, newCentre, out var isCollision);
             if (isCollision)
             {
                 if (collidingObject.Type == ObjectType.Block)
@@ -50,8 +55,9 @@ namespace GameEngine.Main
                     bullet.Centre.Y = newCentre.Y;
 
                     if (collidingObject.Type == ObjectType.Player &&
-                    collidingObject.UniqueId != bullet.OwnerId)
+                        collidingObject.UniqueId != bullet.OwnerId)
                     {
+                        killer = bullet;
                         (collidingObject as Player).IsDestroyed = true;
                     }
                 }
@@ -187,17 +193,18 @@ namespace GameEngine.Main
             bullet.Centre.Y = newY;
         }
 
-        internal static void Upply(Level level, Player player, GameKeys playerStep)
+        internal static void Upply(Level level, Player player, GameActions playerStep, out Bullet killerBullet)
         {
-            if (playerStep == GameKeys.Left || playerStep == GameKeys.Right)
+            killerBullet = null;
+            if (playerStep == GameActions.Left || playerStep == GameActions.Right)
             {
                 Rotate(player, playerStep);
             }
-            else if (playerStep == GameKeys.Move)
+            else if (playerStep == GameActions.Move)
             {
-                Move(level, player, playerSpeed);
+                Move(level, player, playerSpeed, out killerBullet);
             }
-            else if (playerStep == GameKeys.Shoot)
+            else if (playerStep == GameActions.Shoot)
             {
                 SpawnBullet(level, player);
             }
@@ -217,8 +224,9 @@ namespace GameEngine.Main
         }
 
 
-        internal static void Move(Level level, Player player, int speed)
+        internal static void Move(Level level, Player player, int speed, out Bullet killerBullet)
          {
+            killerBullet = null;
             var newX = player.Centre.X + (int)Math.Round(speed * Math.Cos(player.Direction * Math.PI / 180));
             var newY = player.Centre.Y + (int)Math.Round(speed * Math.Sin(player.Direction * Math.PI / 180));
             
@@ -238,6 +246,7 @@ namespace GameEngine.Main
                 else if(collidingObject.Type == ObjectType.Bullet && 
                        (collidingObject as Bullet).OwnerId != player.UniqueId)
                 {
+                    killerBullet = (collidingObject as Bullet);
                     player.IsDestroyed = true;
                     player.Centre.X = newCentre.X;
                     player.Centre.Y = newCentre.Y;
@@ -252,8 +261,8 @@ namespace GameEngine.Main
                 if (gameObj.UniqueId != (obj as IGameObject).UniqueId)
                 {
                     if (gameObj.Type == ObjectType.Block ||
-                    gameObj.Type == ObjectType.Bullet ||
-                    gameObj.Type == ObjectType.Player)
+                        gameObj.Type == ObjectType.Bullet ||
+                        gameObj.Type == ObjectType.Player)
                     {
                         var diff = Mathematics.Distance(newCentre, gameObj.Centre) - gameObj.MaxSize - obj.Radius;
                         if (diff < 0)
@@ -341,14 +350,14 @@ namespace GameEngine.Main
             }
         }
 
-        internal static void Rotate(Player player, GameKeys playerStep)
+        internal static void Rotate(Player player, GameActions playerStep)
         {
-            if (playerStep == GameKeys.Left)
+            if (playerStep == GameActions.Left)
             {
                 var angle = player.Direction - 1;
                 player.Direction = angle;
             }
-            else if (playerStep == GameKeys.Right)
+            else if (playerStep == GameActions.Right)
             {
                 var angle = player.Direction + 1;
                 player.Direction = angle;

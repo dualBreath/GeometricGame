@@ -4,7 +4,7 @@ using System;
 
 namespace GameEngine.Entities
 {
-    class Field : IGameObject, ISquare
+    public class Field : IGameObject, ISquare
     {
         public ObjectType Type => ObjectType.Field;
         public Position Centre { get; set; }

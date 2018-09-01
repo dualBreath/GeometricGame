@@ -8,13 +8,25 @@ using System.Linq;
 
 namespace GameEngine.Utility
 {
-    internal static class ResourceManager
+    public static class ResourceManager
     {
         private static string directory = Directory.GetCurrentDirectory();
 
         public static bool SaveGameState(GameState gameState)
         {
-            throw new NotImplementedException();
+            var filename = "game_state.txt";
+            var path = $"{directory}\\{filename}";
+            var count = 0;
+            var state = new string[gameState.Statistics.AllScores.Count + 1];
+            state[count++] = $"{gameState.LevelName}";
+            foreach(var stat in gameState.Statistics.AllScores)
+            {
+                state[count++] = $"id:{stat.Key};score:{stat.Value}";
+            }
+
+            File.WriteAllLines(path, state);
+
+            return true;
         }
 
         public static bool LoadGameState(GameState gameState)
@@ -31,16 +43,32 @@ namespace GameEngine.Utility
             var filename = $"{levelName}.txt";
             var path = $"{directory}\\{filename}";
             string[] objects = File.ReadAllLines(path);
-            var result = new List<IGameObject>();
+            //var result = new List<IGameObject>();
 
             if(objects == null || objects.Length < 5)
             {
                 return null;
             }
 
-            foreach(var obj in objects)
+            return CreateObjects(objects);
+
+            //foreach(var obj in objects)
+            //{
+            //    if(!TryParse(obj, result))
+            //    {
+            //        return null;
+            //    }
+            //}
+
+            //return result;
+        }
+
+        public static List<IGameObject> CreateObjects(string[] levelObjects)
+        {
+            var result = new List<IGameObject>();
+            foreach (var obj in levelObjects)
             {
-                if(!TryParse(obj, result))
+                if (!TryParse(obj, result))
                 {
                     return null;
                 }

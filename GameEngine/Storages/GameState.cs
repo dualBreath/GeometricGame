@@ -1,10 +1,9 @@
 ﻿namespace GameEngine.Storages
 {
-    internal class GameState
+    public class GameState
     {
         internal string LevelName { get; set; }
         internal Statistics Statistics { get; set; }
-        internal string[] Map { get; set; }
 
         public GameState()
         {

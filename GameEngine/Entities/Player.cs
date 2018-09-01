@@ -3,7 +3,7 @@ using GameEngine.Utility;
 
 namespace GameEngine.Entities
 {
-    class Player : IGameObject, IRound
+    public class Player : IGameObject, IRound
     {
         private int direction;
         public ObjectType Type => ObjectType.Player;
