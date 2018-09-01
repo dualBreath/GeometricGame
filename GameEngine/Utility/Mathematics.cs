@@ -26,7 +26,7 @@ namespace GameEngine.Utility
             return control;
         }
 
-        internal static double Angle(double a, double b, double c)
+        public static double Angle(double a, double b, double c)
         {
             return Math.Acos((a * a + b * b - c * c) / (2 * a * b));
         }

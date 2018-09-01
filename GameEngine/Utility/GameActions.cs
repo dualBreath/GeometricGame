@@ -1,6 +1,6 @@
 ﻿namespace GameEngine.Utility
 {
-    public enum GameKeys
+    public enum GameActions
     {
         Left,
         Right,

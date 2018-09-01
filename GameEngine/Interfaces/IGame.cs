@@ -4,15 +4,12 @@ namespace GameEngine.Interfaces
 {
     interface IGame
     {
-        bool Start();
-        void Stop();
-        bool Step(GameKeys key);
-        void Pause();
-        void Resume();
+        void DoStep(int id, GameActions key);
+        void DoPassiveActions();
         bool SaveGame();
-        bool LoadGame();
-        void SetLevel(string levelName);
+        void LoadLevel(string levelName);
         string GetStatistics();
         string[] GetMap();
+        string GetInfo();
     }
 }

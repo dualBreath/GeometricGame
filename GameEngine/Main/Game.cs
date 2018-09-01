@@ -7,55 +7,42 @@ namespace GameEngine
     public class Game : IGame
     {
         private GameController actor;
+        private GameInfo info;
 
         public Game()
         {
+            info = new GameInfo("Geometric", "1.0.1");
             actor = new GameController();
         }
-
-        public bool Start()
+       
+        public void DoStep(int id, GameActions action)
         {
-            if(actor.State.LevelName == null ||
-               actor.State.LevelName == "" ||
-               actor.State.Statistics == null)
-            {
-                return false;
-            }
-
-            actor.Play();
-
-            return true;
+            actor.DoStep(id, action);
         }
 
-        public bool Step(GameKeys key)
+        public void DoPassiveActions()
         {
-            return actor.Step(key);
+            actor.DoPassiveActions();
         }
 
-        public void Pause()
+        public bool IsLevelEnded()
         {
-            actor.Pause();
-        }
-
-        public void Resume()
-        {
-            actor.Resume();
+            return actor.IsLevelEnded();
         }
 
         public bool SaveGame()
         {
-            Pause();
             return ResourceManager.SaveGameState(actor.State);
         }
-
-        public bool LoadGame()
+        
+        public void LoadLevel(string levelName)
         {
-            return actor.LoadGame();
+            actor.SelectLevel(levelName);
         }
 
-        public void SetLevel(string levelName)
+        public void LoadGame()
         {
-            actor.State.LevelName = levelName; 
+            actor.LoadGame();
         }
 
         public string GetStatistics()
@@ -63,14 +50,14 @@ namespace GameEngine
             return actor.State.Statistics.ConvertToString();
         }
 
+        public string GetInfo()
+        {
+            return info.ConvertToString();
+        }
+
         public string[] GetMap()
         {
             return actor.GetMap();
-        }
-
-        public void Stop()
-        {
-            actor.Stop();
         }
     }
 }

@@ -16,7 +16,7 @@ namespace GameEngine.Storages
             Field = ResourceManager.LoadLevel(levelName);
         }
 
-        public string[] ConvertToString() //need lock
+        public string[] ConvertToString()
         {
             var result = new string[Field.Count];
             var index = 0;

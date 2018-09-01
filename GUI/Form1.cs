@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
@@ -9,9 +10,16 @@ namespace GUI
 {
     public partial class Form1 : Form
     {
-        private volatile Game gameShooter;
-        private volatile string[] map;
+        private Game gameShooter;
         private Thread game;
+        private GameActions playerStep;
+        private bool stopGame;
+        private volatile Bitmap mapImage;
+
+        private double rescaleFactor = 1;//0.01;
+
+
+        public delegate void InvokeDelegate();
 
         public Form1()
         {
@@ -21,69 +29,94 @@ namespace GUI
             game = new Thread(new ThreadStart(Start));
             game.IsBackground = true;
             game.Start();
+
+            stopGame = false;
         }
 
         private void LoadGame()
         {
             gameShooter = new Game();
             gameShooter.LoadGame();
-
-            var img = new Bitmap(mainField.Width, mainField.Height);
-            mainField.Image = img;
-
-            map = gameShooter.GetMap();
-            Drawer.DrawMap(map, mainField);
+            
+            var map = gameShooter.GetMap();
+            mapImage = Drawer.DrawMap(map, mainField.Width, mainField.Height, rescaleFactor);
         }
         
         private void Start()
         {
-            gameShooter.Start();
+            var timer = new Stopwatch();
+            timer.Start();
+            var botStep = GameActions.None;
+
+            while (!stopGame)
+            {
+                if (timer.ElapsedMilliseconds > 100)
+                {
+                    var map = gameShooter.GetMap();
+                    botStep = AI.Bot.Decide(map, 1);
+
+                    gameShooter.DoStep(0, playerStep);
+                    gameShooter.DoStep(1, botStep);
+                    gameShooter.DoPassiveActions();
+                    
+                    mapImage = Drawer.DrawMap(map, mainField.Width, mainField.Height, rescaleFactor);
+                    InvokeUpdateImage();
+
+                    if(gameShooter.IsLevelEnded())
+                    {
+                        gameShooter.SaveGame();
+                        LoadGame();
+                    }
+
+                    playerStep = GameActions.None;
+                    botStep = GameActions.None;
+                    timer.Restart();
+                }              
+            }
+        }
+
+        private void InvokeUpdateImage()
+        {
+            mainField.Image = mapImage;
+            mainField.Invalidate();
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
+            if (e.KeyData == Keys.P)
+            {
+                stopGame = true;
+            }
             if (e.KeyData == Keys.Up)
             {
-                gameShooter.Step(GameKeys.Move);
+                playerStep = GameActions.Move;
             }
             else if (e.KeyData == Keys.Left)
             {
-                gameShooter.Step(GameKeys.Left);
+                playerStep = GameActions.Right;
             }
             else if (e.KeyData == Keys.Right)
             {
-                gameShooter.Step(GameKeys.Right);
+                playerStep = GameActions.Left;
             }
             else if (e.KeyData == Keys.Space)
             {
-                gameShooter.Step(GameKeys.Shoot);
-            }
-        }
-
-        private void mainField_Paint(object sender, PaintEventArgs e)
-        {
-            if (gameShooter != null && gameShooter.GetMap() != null)
-            {
-                var nextMap = gameShooter.GetMap();
-                if (map != nextMap)
-                {
-                    map = nextMap;
-                    Drawer.DrawMap(map, mainField);
-                }
+                playerStep = GameActions.Shoot;
             }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (gameShooter != null)
-            {
-                gameShooter.Stop();
-            }
             if (game != null)
             {
                 game.Abort();
             }
             Application.Exit();
+        }
+
+        private void mainField_LoadCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+        {
+            mainField.BeginInvoke(new InvokeDelegate(InvokeUpdateImage));
         }
     }
 }

@@ -58,8 +58,10 @@ namespace AI.Algorithm
             int level = 0;
             var count = 1;
             waves[0].Add(start);
-            
-            while (count > 0)
+            var total = greed.Total();
+            var totalCount = 0;
+
+            while (count > 0 && totalCount <= total)
             {
                 count = 0;
                 waves.Add(new HashSet<Position>());
@@ -72,7 +74,6 @@ namespace AI.Algorithm
                     {  
                         if (!waves[level].Contains(neighbor.Centre))
                         {
-                            count++;
                             if (greed.IsInDestinations(neighbor.Centre) && 
                                !greed.IsInBlocks(neighbor.Centre) &&
                                 greed.IsInGreed(neighbor.Centre))
@@ -82,6 +83,8 @@ namespace AI.Algorithm
                             }
                             else
                             {
+                                count++;
+                                totalCount += 1;
                                 waves[level + 1].Add(neighbor.Centre);
                             }
                         }

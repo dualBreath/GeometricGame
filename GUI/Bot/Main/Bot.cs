@@ -19,19 +19,24 @@ namespace AI
             botId = id;
         }
 
-        public static GameKeys Decide(Level level)
+        public static GameActions Decide(string[] map, int botId)
         {
-            var player = (Player)level.Field.Find(elem => elem.Type == ObjectType.Player && elem.UniqueId == 0);
-            var bot = (Player)level.Field.Find(elem => elem.Type == ObjectType.Player && elem.UniqueId == 1);
-            var field = (Field)level.Field.Find(elem => elem.Type == ObjectType.Field);
-            int dist = player.Radius;
+            var allObjects = ResourceManager.CreateObjects(map);
+            var player = (Player)allObjects.Find(elem => elem.Type == ObjectType.Player && elem.UniqueId != botId);
+            var bot = (Player)allObjects.Find(elem => elem.Type == ObjectType.Player && elem.UniqueId == botId);
+            var field = (Field)allObjects.Find(elem => elem.Type == ObjectType.Field);            
+            var step = GameActions.None;
 
-            var blocked = CreateBlockedAreas(level.Field, dist);
-            var destinations = CreateDestinationAreas(level.Field, player.Centre, player.Radius / 2);           
+            if (player == null || bot == null || field == null)
+            {
+                return GameActions.None;
+            }
 
-            Greed greed = new Greed(field.Width, field.Height, player.Radius, dist);
-            var step = GameKeys.None;
-            
+            var dist = player.Radius;
+            var blocked = CreateBlockedAreas(allObjects, dist);
+            var destinations = CreateDestinationAreas(allObjects, player.Centre, player.Radius / 2);
+            var greed = new Greed(field.Width, field.Height, player.Radius, dist);
+             
             greed.SetBlocks(blocked);
             greed.SetDestinations(destinations);
             
@@ -47,11 +52,11 @@ namespace AI
             return step;
         }
 
-        private static GameKeys Aim(Player bot, Player player)
+        private static GameActions Aim(Player bot, Player player)
         {
             if (IsRightDirection(bot, player.Centre))
             {
-                return GameKeys.Shoot;
+                return GameActions.Shoot;
             }
             else
             {
@@ -59,15 +64,15 @@ namespace AI
             }
         }
 
-        private static GameKeys TurnToAim(Player bot, Position aim)
+        private static GameActions TurnToAim(Player bot, Position aim)
         {
             var wantedAngle = CalcAngle(bot.Centre, aim);
 
             if(wantedAngle - bot.Direction > 0)
             {
-                return GameKeys.Right;
+                return GameActions.Right;
             }
-            return GameKeys.Left;
+            return GameActions.Left;
         }
 
         private static double CalcAngle(Position centre, Position aim)
@@ -101,21 +106,21 @@ namespace AI
         {
             var angle = CalcAngle(bot.Centre, aim);
 
-            return angle - bot.Direction < 1;
+            return Math.Abs(angle - bot.Direction) < 1;
         }
 
-        private static GameKeys Go(Player bot, Player player, Greed greed)
+        private static GameActions Go(Player bot, Player player, Greed greed)
         {
             var step = LeeSearch.FindFirstStep(bot.Centre, greed);
             if(step == null)
             {
-                return GameKeys.None;
+                return GameActions.None;
             }
             else
             {
                 if (IsRightDirection(bot, step))
                 {
-                    return GameKeys.Move;
+                    return GameActions.Move;
                 }
                 else
                 {
