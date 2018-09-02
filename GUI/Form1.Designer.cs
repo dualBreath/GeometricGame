@@ -29,36 +29,49 @@
         private void InitializeComponent()
         {
             this.mainField = new System.Windows.Forms.PictureBox();
+            this.textBoxStatistics = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.mainField)).BeginInit();
             this.SuspendLayout();
             // 
             // mainField
             // 
-            this.mainField.Location = new System.Drawing.Point(58, 30);
+            this.mainField.Location = new System.Drawing.Point(0, 0);
             this.mainField.Name = "mainField";
-            this.mainField.Size = new System.Drawing.Size(689, 353);
+            this.mainField.Size = new System.Drawing.Size(804, 601);
             this.mainField.TabIndex = 0;
             this.mainField.TabStop = false;
-            this.mainField.LoadCompleted += new System.ComponentModel.AsyncCompletedEventHandler(this.mainField_LoadCompleted);
+            // 
+            // textBoxStatistics
+            // 
+            this.textBoxStatistics.Location = new System.Drawing.Point(810, 3);
+            this.textBoxStatistics.Multiline = true;
+            this.textBoxStatistics.Name = "textBoxStatistics";
+            this.textBoxStatistics.ReadOnly = true;
+            this.textBoxStatistics.Size = new System.Drawing.Size(201, 84);
+            this.textBoxStatistics.TabIndex = 1;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(1016, 605);
+            this.Controls.Add(this.textBoxStatistics);
             this.Controls.Add(this.mainField);
+            this.KeyPreview = true;
             this.Name = "Form1";
             this.Text = "Form1";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.mainField)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
         private System.Windows.Forms.PictureBox mainField;
+        private System.Windows.Forms.TextBox textBoxStatistics;
     }
 }
 

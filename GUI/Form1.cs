@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Threading;
 using System.Windows.Forms;
+using AI;
 using GameEngine;
 using GameEngine.Utility;
 
@@ -10,61 +12,64 @@ namespace GUI
 {
     public partial class Form1 : Form
     {
-        private Game gameShooter;
-        private Thread game;
-        private GameActions playerStep;
-        private bool stopGame;
+        private volatile Game gameShooter;
+        private volatile GameActions playerStep;
+        private volatile bool stopGame;
         private volatile Bitmap mapImage;
+        private volatile Bot bot;
+        private volatile string[] statistics;
 
-        private double rescaleFactor = 1;//0.01;
+        private Thread game;
 
+        private volatile int rescaleFactor = 1;
+
+        private volatile string resourcesDirectoryPath;
+        private volatile string gameStateFileName = "game_state.txt";
+        private volatile string gameLevelFileName = "level.txt";
 
         public delegate void InvokeDelegate();
 
         public Form1()
         {
             InitializeComponent();
-            LoadGame();
 
-            game = new Thread(new ThreadStart(Start));
-            game.IsBackground = true;
+            resourcesDirectoryPath = Directory.GetCurrentDirectory() + "\\Resources";
+            
+            game = new Thread(new ThreadStart(Start))
+            {
+                IsBackground = true
+            };
             game.Start();
 
-            stopGame = false;
+            stopGame = false;            
         }
 
-        private void LoadGame()
-        {
-            gameShooter = new Game();
-            gameShooter.LoadGame();
-            
-            var map = gameShooter.GetMap();
-            mapImage = Drawer.DrawMap(map, mainField.Width, mainField.Height, rescaleFactor);
-        }
-        
         private void Start()
         {
-            var timer = new Stopwatch();
-            timer.Start();
+            LoadGame();
+            var timer = new Stopwatch();            
             var botStep = GameActions.None;
+            var gameStatePath = resourcesDirectoryPath + "\\" + gameStateFileName;
+
+            timer.Start();
 
             while (!stopGame)
             {
                 if (timer.ElapsedMilliseconds > 100)
                 {
                     var map = gameShooter.GetMap();
-                    botStep = AI.Bot.Decide(map, 1);
-
-                    gameShooter.DoStep(0, playerStep);
+                    botStep = bot.Decide(map);
+                    
+                    gameShooter.DoStep(0, playerStep);                    
                     gameShooter.DoStep(1, botStep);
                     gameShooter.DoPassiveActions();
                     
                     mapImage = Drawer.DrawMap(map, mainField.Width, mainField.Height, rescaleFactor);
-                    InvokeUpdateImage();
+                    mainField.BeginInvoke(new InvokeDelegate(InvokeUpdateImage));
 
-                    if(gameShooter.IsLevelEnded())
+                    if (gameShooter.IsLevelEnded())
                     {
-                        gameShooter.SaveGame();
+                        gameShooter.SaveGame(gameStatePath);
                         LoadGame();
                     }
 
@@ -75,10 +80,35 @@ namespace GUI
             }
         }
 
+        private void LoadGame()
+        {
+            var gameStatePath = resourcesDirectoryPath + "\\" + gameStateFileName;
+            var gameLevelPath = resourcesDirectoryPath + "\\" + gameLevelFileName;
+            gameShooter = new Game();
+            gameShooter.LoadGame(gameStatePath, gameLevelPath);
+            statistics = gameShooter.GetStatistics();
+            textBoxStatistics.BeginInvoke(new InvokeDelegate(InvokeUpdateStatistics));
+
+            var map = gameShooter.GetMap();
+            mapImage = Drawer.DrawMap(map, mainField.Width, mainField.Height, rescaleFactor);
+            bot = new Bot(1);
+            bot.CreateMovingController(map);
+        }
+
         private void InvokeUpdateImage()
         {
             mainField.Image = mapImage;
             mainField.Invalidate();
+        }
+
+        private void InvokeUpdateStatistics()
+        {
+            textBoxStatistics.Text = "";
+            foreach (var line in statistics)
+            {
+                textBoxStatistics.Text += line + Environment.NewLine;
+            }
+            textBoxStatistics.Invalidate();
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
@@ -87,17 +117,25 @@ namespace GUI
             {
                 stopGame = true;
             }
-            if (e.KeyData == Keys.Up)
+            if (e.KeyData == Keys.W)
             {
                 playerStep = GameActions.Move;
             }
-            else if (e.KeyData == Keys.Left)
+            else if (e.KeyData == Keys.A)
+            {
+                playerStep = GameActions.Left;
+            }
+            else if (e.KeyData == Keys.D)
             {
                 playerStep = GameActions.Right;
             }
-            else if (e.KeyData == Keys.Right)
+            else if (e.KeyData == Keys.Q)
             {
-                playerStep = GameActions.Left;
+                playerStep = GameActions.FastLeft;
+            }
+            else if (e.KeyData == Keys.E)
+            {
+                playerStep = GameActions.FastRight;
             }
             else if (e.KeyData == Keys.Space)
             {
@@ -112,11 +150,6 @@ namespace GUI
                 game.Abort();
             }
             Application.Exit();
-        }
-
-        private void mainField_LoadCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
-        {
-            mainField.BeginInvoke(new InvokeDelegate(InvokeUpdateImage));
         }
     }
 }

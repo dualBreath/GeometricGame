@@ -16,6 +16,7 @@ namespace GameEngine.Utility
         MiddleRight,
         BottomLeft,
         Bottom,
-        BottomRight
+        BottomRight,
+        Inside
     }
 }

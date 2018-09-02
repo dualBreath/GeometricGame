@@ -16,14 +16,14 @@ namespace GameEngine.Storages
            AllScores[id] = newScore;
         }
 
-        internal string ConvertToString()
+        internal string[] ConvertToString()
         {
-            var result = "";            
+            var result = new string[AllScores.Count];
+            var index = 0;
             foreach(var pair in AllScores)
             {
-                result += $"id:{pair.Key};score:{pair.Value}\n";
+                result[index++] = $"id:{pair.Key};score:{pair.Value}";
             }
-            result.TrimEnd('\n');
             return result;
         }
     }

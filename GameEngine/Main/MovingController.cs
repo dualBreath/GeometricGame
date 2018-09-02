@@ -9,9 +9,11 @@ namespace GameEngine.Main
 {
     internal static class MovingController
     {
-        private static int playerSpeed = 2;
-        private static int bulletSpeed = 2;
-        private static int bulletRadius = 2;
+        private static int playerSpeed = 5;
+        private static int bulletSpeed = 10;
+        private static int bulletRadius = 10;
+        private static int bigRotate = 5;
+        private static int smallRotate = 1;
 
         internal static void MoveBullets(Level level, out Bullet killerBullet)
         {
@@ -81,24 +83,24 @@ namespace GameEngine.Main
             {
                 newY = block.Centre.Y - block.Height / 2 - bullet.Radius;
                 var dX = (int)Math.Round((bullet.Centre.Y - newY) / tg);
-                newX = bullet.Centre.X + dX;
+                newX = bullet.Centre.X - dX;
                 newDirection = 360 - bullet.Direction;
             }
             if (location == Location.Bottom)
             {
                 newY = block.Centre.Y + block.Height / 2 + bullet.Radius;
                 var dX = (int)Math.Round((bullet.Centre.Y - newY) / tg);
-                newX = bullet.Centre.X + dX;
+                newX = bullet.Centre.X - dX;
                 newDirection = 360 - bullet.Direction;
             }
             if (location == Location.MiddleRight)
             {
                 newX = block.Centre.X + block.Width / 2 + bullet.Radius;
                 var dY = (int)Math.Round((bullet.Centre.X - newX) * tg);
-                newY = bullet.Centre.Y + dY;
-                if(bullet.Direction > 180)
+                newY = bullet.Centre.Y - dY;
+                if(bullet.Direction >= 180)
                 {
-                    newDirection = 360 - bullet.Direction + 180;
+                    newDirection = 270 - bullet.Direction + 270;
                 }
                 else
                 {
@@ -109,8 +111,8 @@ namespace GameEngine.Main
             {
                 newX = block.Centre.X - block.Width / 2 - bullet.Radius;
                 var dY = (int)Math.Round((bullet.Centre.X - newX) * tg);
-                newY = bullet.Centre.Y + dY;
-                if (bullet.Direction < 180)
+                newY = bullet.Centre.Y - dY;
+                if (bullet.Direction <= 90)
                 {
                     newDirection = 180 - bullet.Direction;
                 }
@@ -125,14 +127,14 @@ namespace GameEngine.Main
                 {
                     newY = block.Centre.Y - block.Height / 2 - bullet.Radius;
                     var dX = (int)Math.Round((bullet.Centre.Y - newY) / tg);
-                    newX = bullet.Centre.X + dX;
+                    newX = bullet.Centre.X - dX;
                     newDirection = 360 - bullet.Direction;
                 }
                 else
                 {
                     newX = block.Centre.X - block.Width / 2 - bullet.Radius;
                     var dY = (int)Math.Round((bullet.Centre.X - newX) * tg);
-                    newY = bullet.Centre.Y + dY;
+                    newY = bullet.Centre.Y - dY;
                     newDirection = 360 - bullet.Direction + 180;
                 }
             }
@@ -142,14 +144,14 @@ namespace GameEngine.Main
                 {
                     newY = block.Centre.Y - block.Height / 2 - bullet.Radius;
                     var dX = (int)Math.Round((bullet.Centre.Y - newY) / tg);
-                    newX = bullet.Centre.X + dX;
+                    newX = bullet.Centre.X - dX;
                     newDirection = 360 - bullet.Direction + 180;
                 }
                 else
                 {
                     newX = block.Centre.X + block.Width / 2 + bullet.Radius;
                     var dY = (int)Math.Round((bullet.Centre.X - newX) * tg);
-                    newY = bullet.Centre.Y + dY;
+                    newY = bullet.Centre.Y - dY;
                     newDirection = 360 - bullet.Direction;
                 }
             }
@@ -159,14 +161,14 @@ namespace GameEngine.Main
                 {
                     newX = block.Centre.X - block.Width / 2 - bullet.Radius;
                     var dY = (int)Math.Round((bullet.Centre.X - newX) * tg);
-                    newY = bullet.Centre.Y + dY;
+                    newY = bullet.Centre.Y - dY;
                     newDirection = 180 - bullet.Direction;
                 }
                 else
                 {
                     newY = block.Centre.Y + block.Height / 2 + bullet.Radius;
                     var dX = (int)Math.Round((bullet.Centre.Y - newY) / tg);
-                    newX = bullet.Centre.X + dX;
+                    newX = bullet.Centre.X - dX;
                     newDirection = 360 - bullet.Direction;
                 }
             }
@@ -176,14 +178,14 @@ namespace GameEngine.Main
                 {
                     newY = block.Centre.Y + block.Height / 2 + bullet.Radius;
                     var dX = (int)Math.Round((bullet.Centre.Y - newY) / tg);
-                    newX = bullet.Centre.X + dX;
+                    newX = bullet.Centre.X - dX;
                     newDirection = 360 - bullet.Direction;
                 }
                 else
                 {
                     newX = block.Centre.X + block.Width / 2 + bullet.Radius;
                     var dY = (int)Math.Round((bullet.Centre.X - newX) * tg);
-                    newY = bullet.Centre.Y + dY;
+                    newY = bullet.Centre.Y - dY;
                     newDirection = 180 - bullet.Direction;
                 }
             }
@@ -196,7 +198,10 @@ namespace GameEngine.Main
         internal static void Upply(Level level, Player player, GameActions playerStep, out Bullet killerBullet)
         {
             killerBullet = null;
-            if (playerStep == GameActions.Left || playerStep == GameActions.Right)
+            if (playerStep == GameActions.Left || 
+                playerStep == GameActions.Right ||
+                playerStep == GameActions.FastLeft || 
+                playerStep == GameActions.FastRight)
             {
                 Rotate(player, playerStep);
             }
@@ -290,6 +295,10 @@ namespace GameEngine.Main
         private static bool PreciseСalculationCollision(Block block, IRound obj, Position newCentre)
         {
             var location = FindRelativeLocation(block, newCentre);
+            if(location == Location.Inside)
+            {
+                return true;
+            }
 
             if (location == Location.Top || location == Location.Bottom)
             {
@@ -330,7 +339,14 @@ namespace GameEngine.Main
 
         private static Location FindRelativeLocation(Block block, Position newCentre)
         {
-            if(newCentre.X <= block.Centre.X + block.Width / 2 && 
+            if(newCentre.X < block.Centre.X + block.Width / 2 &&
+               newCentre.X > block.Centre.X - block.Width / 2 &&
+               newCentre.Y < block.Centre.Y + block.Height / 2 &&
+               newCentre.Y > block.Centre.Y - block.Height / 2)
+            {
+                return Location.Inside;
+            }
+            else if (newCentre.X <= block.Centre.X + block.Width / 2 && 
                newCentre.X >= block.Centre.X - block.Width / 2)
             {
                 return newCentre.Y >= block.Centre.Y ? Location.Bottom : Location.Top;
@@ -354,12 +370,22 @@ namespace GameEngine.Main
         {
             if (playerStep == GameActions.Left)
             {
-                var angle = player.Direction - 1;
+                var angle = player.Direction - smallRotate;
                 player.Direction = angle;
             }
             else if (playerStep == GameActions.Right)
             {
-                var angle = player.Direction + 1;
+                var angle = player.Direction + smallRotate;
+                player.Direction = angle;
+            }
+            else if(playerStep == GameActions.FastLeft)
+            {
+                var angle = player.Direction - bigRotate;
+                player.Direction = angle;
+            }
+            else if (playerStep == GameActions.FastRight)
+            {
+                var angle = player.Direction + bigRotate;
                 player.Direction = angle;
             }
         }

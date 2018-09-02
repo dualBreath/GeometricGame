@@ -1,164 +1,50 @@
-﻿using AI.Algorithm;
-using AI.Util;
-using GameEngine.Entities;
+﻿using GameEngine.Entities;
 using GameEngine.Interfaces;
-using GameEngine.Storages;
 using GameEngine.Utility;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace AI
 {
-    public static class Bot
+    public class Bot
     {
-        private static int botId = 0;
-        
-        public static void SetBotId(int id)
+        private int botId = 0;
+        private MovingController actor;
+
+        public Bot(int id)
         {
             botId = id;
         }
 
-        public static GameActions Decide(string[] map, int botId)
+        public bool CreateMovingController(string[] map)
         {
             var allObjects = ResourceManager.CreateObjects(map);
-            var player = (Player)allObjects.Find(elem => elem.Type == ObjectType.Player && elem.UniqueId != botId);
-            var bot = (Player)allObjects.Find(elem => elem.Type == ObjectType.Player && elem.UniqueId == botId);
-            var field = (Field)allObjects.Find(elem => elem.Type == ObjectType.Field);            
+            if (IsCorrectField(allObjects, botId))
+            {
+                actor = new MovingController(allObjects, botId);
+            }
+            return false;
+        }
+
+        public GameActions Decide(string[] map)
+        {
+            var allObjects = ResourceManager.CreateObjects(map);
             var step = GameActions.None;
 
-            if (player == null || bot == null || field == null)
+            if (IsCorrectField(allObjects, botId))
             {
-                return GameActions.None;
-            }
-
-            var dist = player.Radius;
-            var blocked = CreateBlockedAreas(allObjects, dist);
-            var destinations = CreateDestinationAreas(allObjects, player.Centre, player.Radius / 2);
-            var greed = new Greed(field.Width, field.Height, player.Radius, dist);
-             
-            greed.SetBlocks(blocked);
-            greed.SetDestinations(destinations);
-            
-            if (greed.IsInDestinations(bot.Centre))
-            {
-                step = Aim(bot, player);
-            }
-            else
-            {
-                step = Go(bot, player, greed);
+                step = actor.GetDecision(allObjects, botId);
             }
 
             return step;
         }
 
-        private static GameActions Aim(Player bot, Player player)
+        private bool IsCorrectField(List<IGameObject> objects, int id)
         {
-            if (IsRightDirection(bot, player.Centre))
-            {
-                return GameActions.Shoot;
-            }
-            else
-            {
-                return TurnToAim(bot, player.Centre);
-            }
-        }
+            var player = (Player)objects.Find(elem => elem.Type == ObjectType.Player && elem.UniqueId != id);
+            var bot = (Player)objects.Find(elem => elem.Type == ObjectType.Player && elem.UniqueId == id);
+            var field = (Field)objects.Find(elem => elem.Type == ObjectType.Field);
 
-        private static GameActions TurnToAim(Player bot, Position aim)
-        {
-            var wantedAngle = CalcAngle(bot.Centre, aim);
-
-            if(wantedAngle - bot.Direction > 0)
-            {
-                return GameActions.Right;
-            }
-            return GameActions.Left;
-        }
-
-        private static double CalcAngle(Position centre, Position aim)
-        {
-            var dx = aim.X - centre.X;
-            var dy = aim.Y - centre.Y;
-
-            var wantedAngle = 0.0;
-
-            if (dx == 0)
-            {
-                wantedAngle = dy < 0 ? 270 : 90;
-            }
-            else
-            {
-                var a = Math.Atan(dy / dx) * 180 / Math.PI;
-                if (a < 0)
-                {
-                    wantedAngle = dx > 0 ? 360 + a : 180 + a;
-                }
-                else
-                {
-                    wantedAngle = dx > 0 ? a : 180 + a;
-                }
-            }
-
-            return wantedAngle;
-        }
-
-        private static bool IsRightDirection(Player bot, Position aim)
-        {
-            var angle = CalcAngle(bot.Centre, aim);
-
-            return Math.Abs(angle - bot.Direction) < 1;
-        }
-
-        private static GameActions Go(Player bot, Player player, Greed greed)
-        {
-            var step = LeeSearch.FindFirstStep(bot.Centre, greed);
-            if(step == null)
-            {
-                return GameActions.None;
-            }
-            else
-            {
-                if (IsRightDirection(bot, step))
-                {
-                    return GameActions.Move;
-                }
-                else
-                {
-                    return TurnToAim(bot, step);
-                }
-            }
-        }
-
-        private static List<Area> CreateBlockedAreas(List<IGameObject> field, int dist)
-        {
-            var blocks = new List<Area>();
-            foreach (var obj in field)
-            {
-                var area = Algorithms.CreateBlockedArea(obj, dist);
-                if (area != null)
-                {
-                    blocks.Add(area);
-                }
-            }
-            return blocks;
-        }
-
-        private static List<Shadow> CreateDestinationAreas(List<IGameObject> field, Position player, int dist)
-        {
-            var blocks = field.Where(elem => elem.Type == ObjectType.Block)
-                              .OrderBy(block => Mathematics.Distance(block.Centre, player));
-
-            var shadows = new List<Shadow>();
-
-            foreach(var block in blocks)
-            {
-                var shadow = Algorithms.CreateShadow(player, block as Block, dist);
-                if (shadow != null)
-                {
-                    shadows.Add(shadow);
-                }
-            }
-            return shadows;
+            return player != null && bot != null && field != null;
         }
     }
 }

@@ -6,9 +6,9 @@ namespace GameEngine.Interfaces
     {
         void DoStep(int id, GameActions key);
         void DoPassiveActions();
-        bool SaveGame();
-        void LoadLevel(string levelName);
-        string GetStatistics();
+        bool SaveGame(string path);
+        void LoadLevel(string path, string levelName);
+        string[] GetStatistics();
         string[] GetMap();
         string GetInfo();
     }

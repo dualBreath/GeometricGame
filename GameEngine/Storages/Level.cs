@@ -10,10 +10,10 @@ namespace GameEngine.Storages
 
         public string LevelName { get; }
 
-        public Level(string levelName)
+        public Level(string path, string levelName)
         {
             LevelName = levelName;
-            Field = ResourceManager.LoadLevel(levelName);
+            Field = ResourceManager.LoadLevel(path);
         }
 
         public string[] ConvertToString()

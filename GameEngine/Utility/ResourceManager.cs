@@ -10,12 +10,8 @@ namespace GameEngine.Utility
 {
     public static class ResourceManager
     {
-        private static string directory = Directory.GetCurrentDirectory();
-
-        public static bool SaveGameState(GameState gameState)
+        public static bool SaveGameState(string path, GameState gameState)
         {
-            var filename = "game_state.txt";
-            var path = $"{directory}\\{filename}";
             var count = 0;
             var state = new string[gameState.Statistics.AllScores.Count + 1];
             state[count++] = $"{gameState.LevelName}";
@@ -29,38 +25,23 @@ namespace GameEngine.Utility
             return true;
         }
 
-        public static bool LoadGameState(GameState gameState)
+        public static bool LoadGameState(string path, GameState gameState)
         {
-            var filename = "game_state.txt";
-            var path = $"{directory}\\{filename}";
             string[] state = File.ReadAllLines(path);
 
             return TryParseGameState(state, gameState);
         }
 
-        public static List<IGameObject> LoadLevel(string levelName)
+        public static List<IGameObject> LoadLevel(string path)
         {
-            var filename = $"{levelName}.txt";
-            var path = $"{directory}\\{filename}";
             string[] objects = File.ReadAllLines(path);
-            //var result = new List<IGameObject>();
-
+           
             if(objects == null || objects.Length < 5)
             {
                 return null;
             }
 
             return CreateObjects(objects);
-
-            //foreach(var obj in objects)
-            //{
-            //    if(!TryParse(obj, result))
-            //    {
-            //        return null;
-            //    }
-            //}
-
-            //return result;
         }
 
         public static List<IGameObject> CreateObjects(string[] levelObjects)
@@ -83,7 +64,6 @@ namespace GameEngine.Utility
             {
                 return false;
             }
-            //"id:1;score:2"
             gameState.LevelName = state[0];
 
             foreach(var line in state.Skip(1))
@@ -149,10 +129,6 @@ namespace GameEngine.Utility
             {
                 return CreateBullet(parameters);
             }
-            //if (type == ObjectType.Enemy)
-            //{
-            //    return CreateEnemy(parameters);
-            //}
             if (type == ObjectType.Player)
             {
                 return CreatePlayer(parameters);

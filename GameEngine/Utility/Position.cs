@@ -13,6 +13,8 @@
 
         public bool Equal(Position other)
         {
+            if (other == null)
+                return false;
             return X == other.X && Y == other.Y;
         }
 

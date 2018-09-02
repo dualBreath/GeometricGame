@@ -6,10 +6,12 @@ namespace AI.Algorithm
 {
     static class LeeSearch
     {
-        public static Position FindFirstStep(Position start, Greed greed)
+        public static Stack<Position> FindPath(Position start, Greed greed)
         {
-            var waves = new List<HashSet<Position>>();
-            waves.Add(new HashSet<Position>());
+            var waves = new List<HashSet<Position>>
+            {
+                new HashSet<Position>()
+            };
             var finish = new Position(0, 0);
             bool isFind = FindFinish(waves, start, greed, out finish);
 
@@ -18,18 +20,18 @@ namespace AI.Algorithm
                 return null;
             }
 
-            Position firstStep = ReestablishPath(waves, start, finish, greed);
+            var path = ReestablishPath(waves, start, finish, greed);
 
-            return firstStep;
+            return path;
         }
 
-        private static Position ReestablishPath(List<HashSet<Position>> waves, Position start, Position finish, Greed greed)
+        private static Stack<Position> ReestablishPath(List<HashSet<Position>> waves, Position start, Position finish, Greed greed)
         {
             var current = finish;
             var level = waves.Count - 2;
-            var step = current;
             var isBreak = false;
-
+            var path = new Stack<Position>();
+            
             while(!isBreak && level > -1)
             {
                 isBreak = true;
@@ -40,8 +42,8 @@ namespace AI.Algorithm
                     {
                         isBreak = false;
                         level--;
-                        step = current;
-                        current = neighbor.Centre;
+                        path.Push(current);
+                        current = neighbor.Centre;                                                
                         break;
                     }
                 }
@@ -50,7 +52,7 @@ namespace AI.Algorithm
             {
                 return null;
             }
-            return step;
+            return path;
         }
 
         private static bool FindFinish(List<HashSet<Position>> waves, Position start, Greed greed, out Position finish)
@@ -60,6 +62,10 @@ namespace AI.Algorithm
             waves[0].Add(start);
             var total = greed.Total();
             var totalCount = 0;
+            var alreadyViewed = new HashSet<Position>()
+            {
+                start
+            };
 
             while (count > 0 && totalCount <= total)
             {
@@ -72,7 +78,7 @@ namespace AI.Algorithm
                     
                     foreach (var neighbor in neighbors)
                     {  
-                        if (!waves[level].Contains(neighbor.Centre))
+                        if (!alreadyViewed.Contains(neighbor.Centre))
                         {
                             if (greed.IsInDestinations(neighbor.Centre) && 
                                !greed.IsInBlocks(neighbor.Centre) &&
@@ -86,6 +92,7 @@ namespace AI.Algorithm
                                 count++;
                                 totalCount += 1;
                                 waves[level + 1].Add(neighbor.Centre);
+                                alreadyViewed.Add(neighbor.Centre);
                             }
                         }
                     }

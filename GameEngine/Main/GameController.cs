@@ -22,10 +22,10 @@ namespace GameEngine
             isLevelEnded = false;
         }
 
-        internal bool SelectLevel(string levelName)
+        internal bool SelectLevel(string path, string levelName)
         {
             State = new GameState();
-            currentLevel = new Level(levelName);
+            currentLevel = new Level(path, levelName);
             return currentLevel != null;
         }
 
@@ -34,10 +34,10 @@ namespace GameEngine
             return isLevelEnded;
         }
 
-        internal bool LoadGame()
+        internal bool LoadGame(string statePath, string levelPath)
         {
-            bool result = ResourceManager.LoadGameState(State);
-            currentLevel = new Level(State.LevelName);
+            bool result = ResourceManager.LoadGameState(statePath, State);
+            currentLevel = new Level(levelPath, State.LevelName);
             result &= currentLevel != null;
             return result;
         }

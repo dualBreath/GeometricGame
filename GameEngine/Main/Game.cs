@@ -30,22 +30,22 @@ namespace GameEngine
             return actor.IsLevelEnded();
         }
 
-        public bool SaveGame()
+        public bool SaveGame(string path)
         {
-            return ResourceManager.SaveGameState(actor.State);
+            return ResourceManager.SaveGameState(path, actor.State);
         }
         
-        public void LoadLevel(string levelName)
+        public void LoadLevel(string path, string levelName)
         {
-            actor.SelectLevel(levelName);
+            actor.SelectLevel(path, levelName);
         }
 
-        public void LoadGame()
+        public void LoadGame(string statePath, string levelPath)
         {
-            actor.LoadGame();
+            actor.LoadGame(statePath, levelPath);
         }
 
-        public string GetStatistics()
+        public string[] GetStatistics()
         {
             return actor.State.Statistics.ConvertToString();
         }

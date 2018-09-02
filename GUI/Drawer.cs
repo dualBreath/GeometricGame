@@ -57,6 +57,11 @@ namespace GUI
                 var xPosGun = xPos + (int)Math.Round(r * Math.Cos(angle * Math.PI / 180));
                 var yPosGun = yPos + (int)Math.Round(r * Math.Sin(angle * Math.PI / 180));
                 g.FillEllipse(Brushes.Black, xPosGun - r1, yPosGun - r1, r1 * 2, r1 * 2);
+
+                var id = param[1];
+                Rectangle rect = new Rectangle(xPos - r/2, yPos - r/2, r, r);
+
+                g.DrawString(id, new Font("Times New Roman", 18.0f), Brushes.Black, rect);
             }
         }
     }

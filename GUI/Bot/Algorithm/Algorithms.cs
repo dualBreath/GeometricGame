@@ -35,43 +35,45 @@ namespace AI.Util
             var leftBottom = new Position(block.Centre.X - block.Width / 2 - buffer, block.Centre.Y + block.Height / 2 + buffer);
             var rightBottom = new Position(block.Centre.X + block.Width / 2 + buffer, block.Centre.Y + block.Height / 2 + buffer);
 
-            var angleLT = CalcAngle(player, leftTop, block.Centre);
-            var angleRT = CalcAngle(player, rightTop, block.Centre);
-            var angleLB = CalcAngle(player, leftBottom, block.Centre);
-            var angleRB = CalcAngle(player, rightBottom, block.Centre);
-
-            var max = angleLT + angleRT;
+            var angleLTRB = CalcAngle(player, leftTop, rightBottom);
+            var angleLTLB = CalcAngle(player, leftTop, leftBottom);
+            var angleLTRT = CalcAngle(player, leftTop, rightTop);
+            var angleLBRT = CalcAngle(player, leftBottom, rightTop);
+            var angleLBRB = CalcAngle(player, leftBottom, rightBottom);
+            var angleRTRB = CalcAngle(player, rightTop, rightBottom);
+            
+            var max = angleLTRB;
             var first = leftTop;
             var second = rightBottom;
-            if (angleLT + angleLB > max)
+            if (angleLTLB > max)
             {
-                max = angleLT + angleLB;
+                max = angleLTLB;
                 first = leftTop;
                 second = leftBottom;
             }
-            if (angleLT + angleRB > max)
+            if (angleLTRT > max)
             {
-                max = angleLT + angleRB;
+                max = angleLTRT;
                 first = leftTop;
-                second = rightBottom;
-            }
-            if (angleRB + angleRT > max)
-            {
-                max = angleRB + angleRT;
-                first = rightBottom;
                 second = rightTop;
             }
-            if (angleRB + angleLB > max)
+            if (angleLBRT > max)
             {
-                max = angleRB + angleLB;
-                first = rightBottom;
-                second = leftBottom;
+                max = angleLBRT;
+                first = leftBottom;
+                second = rightTop;
             }
-            if (angleRT + angleLB > max)
+            if (angleLBRB > max)
             {
-                max = angleRT + angleLB;
+                max = angleLBRB;
+                first = leftBottom;
+                second = rightBottom;
+            }
+            if (angleRTRB > max)
+            {
+                max = angleRTRB;
                 first = rightTop;
-                second = leftBottom;
+                second = rightBottom;
             }
             corner1 = first;
             corner2 = second;
