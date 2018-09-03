@@ -51,6 +51,7 @@
     <Compile Include="Bot\Main\MovingController.cs" />
     <Compile Include="Bot\Util\Area.cs" />
     <Compile Include="Bot\Util\Greed.cs" />
+    <Compile Include="Bot\Util\Pair.cs" />
     <Compile Include="Bot\Util\Quater.cs" />
     <Compile Include="Bot\Util\Shadow.cs" />
     <Compile Include="Drawer.cs" />

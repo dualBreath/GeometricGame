@@ -30,6 +30,9 @@
         {
             this.mainField = new System.Windows.Forms.PictureBox();
             this.textBoxStatistics = new System.Windows.Forms.TextBox();
+            this.buttonStart = new System.Windows.Forms.Button();
+            this.buttonPause = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.mainField)).BeginInit();
             this.SuspendLayout();
             // 
@@ -43,18 +46,50 @@
             // 
             // textBoxStatistics
             // 
-            this.textBoxStatistics.Location = new System.Drawing.Point(810, 3);
+            this.textBoxStatistics.Location = new System.Drawing.Point(810, 69);
             this.textBoxStatistics.Multiline = true;
             this.textBoxStatistics.Name = "textBoxStatistics";
             this.textBoxStatistics.ReadOnly = true;
             this.textBoxStatistics.Size = new System.Drawing.Size(201, 84);
             this.textBoxStatistics.TabIndex = 1;
             // 
+            // buttonStart
+            // 
+            this.buttonStart.Location = new System.Drawing.Point(331, 227);
+            this.buttonStart.Name = "buttonStart";
+            this.buttonStart.Size = new System.Drawing.Size(144, 74);
+            this.buttonStart.TabIndex = 2;
+            this.buttonStart.Text = "Start";
+            this.buttonStart.UseVisualStyleBackColor = true;
+            this.buttonStart.MouseClick += new System.Windows.Forms.MouseEventHandler(this.buttonStart_MouseClick);
+            // 
+            // buttonPause
+            // 
+            this.buttonPause.Location = new System.Drawing.Point(855, 191);
+            this.buttonPause.Name = "buttonPause";
+            this.buttonPause.Size = new System.Drawing.Size(122, 56);
+            this.buttonPause.TabIndex = 3;
+            this.buttonPause.Text = "Pause";
+            this.buttonPause.UseVisualStyleBackColor = true;
+            this.buttonPause.MouseClick += new System.Windows.Forms.MouseEventHandler(this.buttonPause_MouseClick);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(810, 53);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(40, 13);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "Scores";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1016, 605);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.buttonPause);
+            this.Controls.Add(this.buttonStart);
             this.Controls.Add(this.textBoxStatistics);
             this.Controls.Add(this.mainField);
             this.KeyPreview = true;
@@ -72,6 +107,9 @@
 
         private System.Windows.Forms.PictureBox mainField;
         private System.Windows.Forms.TextBox textBoxStatistics;
+        private System.Windows.Forms.Button buttonStart;
+        private System.Windows.Forms.Button buttonPause;
+        private System.Windows.Forms.Label label1;
     }
 }
 

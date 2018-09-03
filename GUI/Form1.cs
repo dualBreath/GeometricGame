@@ -15,6 +15,7 @@ namespace GUI
         private volatile Game gameShooter;
         private volatile GameActions playerStep;
         private volatile bool stopGame;
+        private volatile bool pauseGame;
         private volatile Bitmap mapImage;
         private volatile Bot bot;
         private volatile string[] statistics;
@@ -39,7 +40,6 @@ namespace GUI
             {
                 IsBackground = true
             };
-            game.Start();
 
             stopGame = false;            
         }
@@ -55,28 +55,31 @@ namespace GUI
 
             while (!stopGame)
             {
-                if (timer.ElapsedMilliseconds > 100)
+                while (!pauseGame)
                 {
-                    var map = gameShooter.GetMap();
-                    botStep = bot.Decide(map);
-                    
-                    gameShooter.DoStep(0, playerStep);                    
-                    gameShooter.DoStep(1, botStep);
-                    gameShooter.DoPassiveActions();
-                    
-                    mapImage = Drawer.DrawMap(map, mainField.Width, mainField.Height, rescaleFactor);
-                    mainField.BeginInvoke(new InvokeDelegate(InvokeUpdateImage));
-
-                    if (gameShooter.IsLevelEnded())
+                    if (timer.ElapsedMilliseconds > 100)
                     {
-                        gameShooter.SaveGame(gameStatePath);
-                        LoadGame();
-                    }
+                        var map = gameShooter.GetMap();
+                        botStep = bot.Decide(map);
 
-                    playerStep = GameActions.None;
-                    botStep = GameActions.None;
-                    timer.Restart();
-                }              
+                        gameShooter.DoStep(0, playerStep);
+                        gameShooter.DoStep(1, botStep);
+                        gameShooter.DoPassiveActions();
+
+                        mapImage = Drawer.DrawMap(map, mainField.Width, mainField.Height, rescaleFactor);
+                        mainField.BeginInvoke(new InvokeDelegate(InvokeUpdateImage));
+
+                        if (gameShooter.IsLevelEnded())
+                        {
+                            gameShooter.SaveGame(gameStatePath);
+                            LoadGame();
+                        }
+
+                        playerStep = GameActions.None;
+                        botStep = GameActions.None;
+                        timer.Restart();
+                    }
+                }
             }
         }
 
@@ -115,7 +118,7 @@ namespace GUI
         {
             if (e.KeyData == Keys.P)
             {
-                stopGame = true;
+                pauseGame = !pauseGame;
             }
             if (e.KeyData == Keys.W)
             {
@@ -150,6 +153,25 @@ namespace GUI
                 game.Abort();
             }
             Application.Exit();
+        }
+
+        private void buttonStart_MouseClick(object sender, MouseEventArgs e)
+        {
+            buttonStart.Visible = false;
+            game.Start();
+        }
+
+        private void buttonPause_MouseClick(object sender, MouseEventArgs e)
+        {
+            if(pauseGame)
+            {
+                buttonPause.Text = "Pause";
+            }
+            else
+            {
+                buttonPause.Text = "Resume";
+            }
+            pauseGame = !pauseGame;
         }
     }
 }

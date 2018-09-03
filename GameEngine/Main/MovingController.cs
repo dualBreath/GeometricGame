@@ -10,7 +10,7 @@ namespace GameEngine.Main
     internal static class MovingController
     {
         private static int playerSpeed = 5;
-        private static int bulletSpeed = 10;
+        private static int bulletSpeed = 5;
         private static int bulletRadius = 10;
         private static int bigRotate = 5;
         private static int smallRotate = 1;
@@ -339,10 +339,10 @@ namespace GameEngine.Main
 
         private static Location FindRelativeLocation(Block block, Position newCentre)
         {
-            if(newCentre.X < block.Centre.X + block.Width / 2 &&
-               newCentre.X > block.Centre.X - block.Width / 2 &&
-               newCentre.Y < block.Centre.Y + block.Height / 2 &&
-               newCentre.Y > block.Centre.Y - block.Height / 2)
+            if(newCentre.X <= block.Centre.X + block.Width / 2 &&
+               newCentre.X >= block.Centre.X - block.Width / 2 &&
+               newCentre.Y <= block.Centre.Y + block.Height / 2 &&
+               newCentre.Y >= block.Centre.Y - block.Height / 2)
             {
                 return Location.Inside;
             }

@@ -25,7 +25,7 @@ namespace AI
 
             lastPlayerPos = new Position(player.Centre.X, player.Centre.Y);
 
-            greed = new Greed(field.Width, field.Height, player.Radius, dist);//2 * dist);            
+            greed = new Greed(field.Width, field.Height, bot.Radius, dist);//2 * dist);            
             greed.SetBlocks(CreateBlockedAreas(allObjects, dist));
             greed.SetShadows(CreateShadows(allObjects, player.Centre, player.Radius / 2));
 
@@ -64,11 +64,16 @@ namespace AI
             if (path != null)
             {
                 var pos = path.Peek();
-                if (bot.Centre.X == pos.X &&
-                    bot.Centre.Y == pos.Y)
+                
+                if (Algorithms.IsInArea(bot.Centre, new Area(pos.X, pos.Y, bot.Radius / 4, bot.Radius / 4)))
                 {
                     path.Pop();
                 }
+                //if (bot.Centre.X == pos.X &&
+                //    bot.Centre.Y == pos.Y)
+                //{
+                //    path.Pop();
+                //}
 
                 if (path.Count != 0)
                 {
